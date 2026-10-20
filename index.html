@@ -3,49 +3,57 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Dragon Ball Daima: Run & Gun</title>
+  <title>Dragon Ball Daima: Run & Gun - Motor Completo Mobile</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; touch-action: none; }
     body {
-      background: #07090e; color: #f1f5f9; font-family: system-ui, sans-serif;
+      background: #07090e; color: #f1f5f9; font-family: 'Segoe UI', system-ui, sans-serif;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       min-height: 100vh; overflow: hidden; user-select: none;
     }
     #top-bar {
       width: 100%; max-width: 1024px; display: flex; justify-content: space-between; align-items: center;
-      padding: 6px 10px; background: #111520; border: 1px solid #262f45; border-bottom: none; font-size: 11px;
+      padding: 6px 10px; background: #111520; border: 1px solid #262f45; border-bottom: none; font-size: 11px; gap: 6px; flex-wrap: wrap;
     }
-    .badge { background: #ea580c; color: #fff; padding: 3px 8px; border-radius: 4px; font-weight: 700; }
-    .file-btn { background: #1e293b; border: 1px solid #3b82f6; color: #93c5fd; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; }
+    .badge { background: linear-gradient(135deg, #ea580c, #dc2626); color: #fff; padding: 3px 8px; border-radius: 4px; font-weight: 700; }
+    .file-btn { background: #1e293b; border: 1px solid #3b82f6; color: #93c5fd; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 600; }
     input[type="file"] { display: none; }
     #canvas-wrap { position: relative; width: 100%; max-width: 1024px; aspect-ratio: 16/9; }
     canvas { width: 100%; height: 100%; background: #0f172a; border: 1px solid #262f45; display: block; }
+    
+    /* Controles Táctiles Flotantes estilo Consola Portátil */
     #mobile-controls {
       position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
-      pointer-events: none; display: flex; justify-content: space-between; align-items: flex-end; padding: 15px;
+      pointer-events: none; display: flex; justify-content: space-between; align-items: flex-end; padding: 12px;
     }
-    .touch-cluster { pointer-events: auto; display: flex; gap: 10px; }
+    #dpad { display: grid; grid-template-columns: repeat(3, 48px); grid-template-rows: repeat(3, 48px); gap: 2px; pointer-events: auto; }
+    .d-btn { background: rgba(30, 41, 59, 0.7); border: 1px solid #38bdf8; border-radius: 8px; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .d-btn:active { background: #38bdf8; color: #000; }
+    
+    .touch-cluster { pointer-events: auto; display: flex; gap: 8px; align-items: flex-end; }
     .t-btn {
-      width: 65px; height: 65px; background: rgba(30, 41, 59, 0.75); border: 2px solid #38bdf8;
-      border-radius: 50%; color: #fff; font-size: 14px; font-weight: bold;
-      display: flex; align-items: center; justify-content: center;
+      width: 58px; height: 58px; background: rgba(30, 41, 59, 0.75); border: 2px solid rgba(56, 189, 248, 0.7);
+      border-radius: 50%; color: #fff; font-size: 12px; font-weight: bold;
+      display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     }
-    #dpad { display: grid; grid-template-columns: repeat(3, 50px); grid-template-rows: repeat(3, 50px); gap: 2px; pointer-events: auto; }
-    .d-btn { background: rgba(30, 41, 59, 0.75); border: 1px solid #38bdf8; border-radius: 8px; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .t-btn:active { background: rgba(56, 189, 248, 0.4); transform: scale(0.95); }
   </style>
 </head>
 <body>
 
   <div id="top-bar">
     <span class="badge" id="scene-badge">MAPA ISOMÉTRICO</span>
-    <div>
+    <div style="display:flex; gap:5px;">
       <label class="file-btn">🥋 Cargar Goku <input type="file" id="goku-upload" accept="image/*"></label>
-      <button class="file-btn" id="toggle-scene-btn" style="color:#fde047;">⚔️ Cambiar</button>
+      <label class="file-btn">👹 Cargar Jefe <input type="file" id="boss-upload" accept="image/*"></label>
+      <button class="file-btn" id="toggle-scene-btn" style="border-color:#f59e0b; color:#fde047;">⚔️ Cambiar Escena</button>
     </div>
   </div>
 
   <div id="canvas-wrap">
     <canvas id="game" width="1024" height="576"></canvas>
+
+    <!-- Botones táctiles virtuales para iPhone -->
     <div id="mobile-controls">
       <div id="dpad">
         <div></div><div class="d-btn" id="btn-up">⬆️</div><div></div>
@@ -53,7 +61,9 @@
         <div></div><div class="d-btn" id="btn-down">⬇️</div><div></div>
       </div>
       <div class="touch-cluster">
-        <div class="t-btn" id="btn-jump" style="background:#3b82f6;">Salto</div>
+        <div class="t-btn" id="btn-dash" style="background:rgba(234,88,12,0.8);">Dash</div>
+        <div class="t-btn" id="btn-shoot" style="background:rgba(239,68,68,0.8);">Ki</div>
+        <div class="t-btn" id="btn-jump" style="background:rgba(59,130,246,0.8); width:66px; height:66px;">Salto</div>
       </div>
     </div>
   </div>
@@ -63,7 +73,71 @@ const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 const sceneBadge = document.getElementById('scene-badge');
 
-const TouchInput = { up: false, down: false, left: false, right: false, jump: false };
+// Carga de Imágenes Base
+const overworldImg = new Image(); overworldImg.src = 'Isometric_fantasy_tower_and_river_2K_20261019195314.jpg';
+const arenaImg = new Image(); arenaImg.src = 'Stone_tower_courtyard_battle_background_2K_20261020002213.jpg';
+const rawGokuImg = new Image(); rawGokuImg.src = 'Character_standing_in_hero_pose_2K_20261019200614.jpg';
+const rawBossImg = new Image(); rawBossImg.src = 'Boss_sprite_sheet_grid_layout_2K_20261020002048.jpg';
+
+let gokuCanvas = null, bossCanvas = null;
+function makeChroma(img) {
+  const off = document.createElement('canvas'); off.width = img.naturalWidth || img.width; off.height = img.naturalHeight || img.height;
+  const octx = off.getContext('2d'); octx.drawImage(img, 0, 0);
+  try {
+    const data = octx.getImageData(0,0,off.width,off.height).data;
+    const r0=data[0], g0=data[1], b0=data[2];
+    for(let i=0; i<data.length; i+=4) {
+      if(Math.abs(data[i]-r0)+Math.abs(data[i+1]-g0)+Math.abs(data[i+2]-b0) < 36) data[i+3]=0;
+    }
+    octx.putImageData(new ImageData(data, off.width, off.height), 0, 0);
+  } catch(e){}
+  return off;
+}
+rawGokuImg.onload = () => { gokuCanvas = makeChroma(rawGokuImg); };
+rawBossImg.onload = () => { bossCanvas = makeChroma(rawBossImg); };
+
+// Carga manual por si el entorno web no encuentra las rutas locales exactas
+document.getElementById('goku-upload').addEventListener('change', e => {
+  const f = e.target.files[0]; if(f){ const r = new FileReader(); r.onload = ev => { rawGokuImg.src = ev.target.result; }; r.readAsDataURL(f); }
+});
+document.getElementById('boss-upload').addEventListener('change', e => {
+  const f = e.target.files[0]; if(f){ const r = new FileReader(); r.onload = ev => { rawBossImg.src = ev.target.result; }; r.readAsDataURL(f); }
+});
+
+// Sprites y Animaciones Reales
+const GOKU_FRAMES = {
+  idle_1: { x: 0.01, y: 0.01, w: 0.19, h: 0.245 },
+  idle_2: { x: 0.20, y: 0.01, w: 0.19, h: 0.245 },
+  ready:  { x: 0.39, y: 0.01, w: 0.20, h: 0.245 },
+  run_fast: { x: 0.58, y: 0.01, w: 0.21, h: 0.245 },
+  jump_up: { x: 0.79, y: 0.01, w: 0.20, h: 0.245 },
+  walk_1: { x: 0.01, y: 0.255, w: 0.19, h: 0.245 },
+  walk_2: { x: 0.20, y: 0.255, w: 0.19, h: 0.245 },
+  walk_3: { x: 0.39, y: 0.255, w: 0.19, h: 0.245 },
+  air_kick: { x: 0.78, y: 0.255, w: 0.21, h: 0.245 }
+};
+const GOKU_ANIMS = {
+  idle: { frames: ['idle_1', 'idle_2', 'ready'], fps: 3.5 },
+  run: { frames: ['walk_1', 'walk_2', 'walk_3', 'run_fast'], fps: 10 },
+  jump: { frames: ['jump_up', 'air_kick'], fps: 6 }
+};
+const BOSS_FRAMES = { idle: { x: 0.01, y: 0.02, w: 0.435, h: 0.47, flip: false } };
+
+function drawGoku(frameKey, x, y, scale = 0.27, facingRight = true) {
+  const src = gokuCanvas || (rawGokuImg.complete && rawGokuImg.naturalWidth ? rawGokuImg : null);
+  const r = GOKU_FRAMES[frameKey] || GOKU_FRAMES.idle_1;
+  ctx.save(); ctx.translate(x, y); if(!facingRight) ctx.scale(-1, 1);
+  if(src) {
+    const sw = src.width * r.w, sh = src.height * r.h;
+    ctx.drawImage(src, src.width * r.x, src.height * r.y, sw, sh, -(sw*scale)/2, -(sh*scale)+10, sw*scale, sh*scale);
+  } else {
+    ctx.fillStyle='#ea580c'; ctx.beginPath(); ctx.arc(0,-20,20,0,Math.PI*2); ctx.fill();
+  }
+  ctx.restore();
+}
+
+// Control Táctil y Teclado Unificado
+const TouchInput = { up: false, down: false, left: false, right: false, jump: false, shoot: false, dash: false };
 function bindTouch(id, key) {
   const el = document.getElementById(id);
   if(!el) return;
@@ -73,10 +147,13 @@ function bindTouch(id, key) {
   el.addEventListener('mouseup', () => TouchInput[key] = false);
 }
 bindTouch('btn-up', 'up'); bindTouch('btn-down', 'down');
-bindTouch('btn-left', 'left'); bindTouch('btn-right', 'right'); bindTouch('btn-jump', 'jump');
+bindTouch('btn-left', 'left'); bindTouch('btn-right', 'right');
+bindTouch('btn-jump', 'jump'); bindTouch('btn-shoot', 'shoot'); bindTouch('btn-dash', 'dash');
 
 let scene = 'OVERWORLD';
-const MapPlayer = { x: 512, y: 288, speed: 220, facingRight: true };
+const MapPlayer = { x: 470, y: 335, speed: 220, facingRight: true, animState: 'idle', animTimer: 0, frameIdx: 0 };
+const GroundY = 508;
+let PlayerCombat = { x: 185, y: GroundY, vy: 0, grounded: true, hp: 3 };
 
 document.getElementById('toggle-scene-btn').addEventListener('click', () => {
   scene = scene === 'OVERWORLD' ? 'LEVEL' : 'OVERWORLD';
@@ -85,25 +162,44 @@ document.getElementById('toggle-scene-btn').addEventListener('click', () => {
 
 function update(dt) {
   let dx = 0, dy = 0;
-  if (TouchInput.left) dx = -1;
-  if (TouchInput.right) dx = 1;
-  if (TouchInput.up) dy = -1;
-  if (TouchInput.down) dy = 1;
-  MapPlayer.x += dx * MapPlayer.speed * dt;
-  MapPlayer.y += dy * MapPlayer.speed * dt;
+  if(TouchInput.left) dx = -1;
+  if(TouchInput.right) dx = 1;
+  if(TouchInput.up) dy = -1;
+  if(TouchInput.down) dy = 1;
+
+  if (scene === 'OVERWORLD') {
+    MapPlayer.x += dx * MapPlayer.speed * dt;
+    MapPlayer.y += dy * MapPlayer.speed * dt;
+    if(dx !== 0) MapPlayer.facingRight = dx > 0;
+    MapPlayer.animState = (dx !== 0 || dy !== 0) ? 'run' : 'idle';
+    const anim = GOKU_ANIMS[MapPlayer.animState];
+    MapPlayer.animTimer += dt * anim.fps;
+    if(MapPlayer.animTimer >= 1) { MapPlayer.animTimer = 0; MapPlayer.frameIdx = (MapPlayer.frameIdx+1)%anim.frames.length; }
+  } else {
+    PlayerCombat.x += dx * 350 * dt;
+    if(TouchInput.jump && PlayerCombat.grounded) {
+      PlayerCombat.vy = -750; PlayerCombat.grounded = false;
+    }
+    PlayerCombat.vy += 1800 * dt;
+    PlayerCombat.y += PlayerCombat.vy * dt;
+    if(PlayerCombat.y >= GroundY) { PlayerCombat.y = GroundY; PlayerCombat.vy = 0; PlayerCombat.grounded = true; }
+  }
 }
 
-function draw() {
+function draw(now) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   if (scene === 'OVERWORLD') {
-    ctx.fillStyle = '#1e3a8a'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (overworldImg.complete && overworldImg.naturalWidth > 0) {
+      ctx.drawImage(overworldImg, 0, overworldImg.naturalHeight * 0.24, overworldImg.naturalWidth, overworldImg.naturalHeight * 0.52, 0, 0, canvas.width, canvas.height);
+    } else { ctx.fillStyle = '#1e3a8a'; ctx.fillRect(0,0,canvas.width,canvas.height); }
+    const anim = GOKU_ANIMS[MapPlayer.animState];
+    drawGoku(anim.frames[MapPlayer.frameIdx % anim.frames.length], MapPlayer.x, MapPlayer.y, 0.27, MapPlayer.facingRight);
   } else {
-    ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (arenaImg.complete && arenaImg.naturalWidth > 0) {
+      ctx.drawImage(arenaImg, 0, 0, canvas.width, canvas.height);
+    } else { ctx.fillStyle = '#0f172a'; ctx.fillRect(0,0,canvas.width,canvas.height); }
+    drawGoku('idle_1', PlayerCombat.x, PlayerCombat.y, 0.3, true);
   }
-  // Dibujar a Goku (Placeholder circular naranja)
-  ctx.fillStyle = '#ea580c';
-  ctx.beginPath(); ctx.arc(MapPlayer.x, MapPlayer.y, 24, 0, Math.PI*2); ctx.fill();
-  ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke();
 }
 
 let lastTime = performance.now();
@@ -111,7 +207,7 @@ function loop(now) {
   const dt = Math.min(0.033, (now - lastTime) / 1000);
   lastTime = now;
   update(dt);
-  draw();
+  draw(now);
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
