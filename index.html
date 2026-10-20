@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Dragon Ball Daima: Run & Gun</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; touch-action: none; }
+    body {
+      background: #07090e; color: #f1f5f9; font-family: system-ui, sans-serif;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; overflow: hidden; user-select: none;
+    }
+    #top-bar {
+      width: 100%; max-width: 1024px; display: flex; justify-content: space-between; align-items: center;
+      padding: 6px 10px; background: #111520; border: 1px solid #262f45; border-bottom: none; font-size: 11px;
+    }
+    .badge { background: #ea580c; color: #fff; padding: 3px 8px; border-radius: 4px; font-weight: 700; }
+    .file-btn { background: #1e293b; border: 1px solid #3b82f6; color: #93c5fd; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; }
+    input[type="file"] { display: none; }
+    #canvas-wrap { position: relative; width: 100%; max-width: 1024px; aspect-ratio: 16/9; }
+    canvas { width: 100%; height: 100%; background: #0f172a; border: 1px solid #262f45; display: block; }
+    #mobile-controls {
+      position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; display: flex; justify-content: space-between; align-items: flex-end; padding: 15px;
+    }
+    .touch-cluster { pointer-events: auto; display: flex; gap: 10px; }
+    .t-btn {
+      width: 65px; height: 65px; background: rgba(30, 41, 59, 0.75); border: 2px solid #38bdf8;
+      border-radius: 50%; color: #fff; font-size: 14px; font-weight: bold;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #dpad { display: grid; grid-template-columns: repeat(3, 50px); grid-template-rows: repeat(3, 50px); gap: 2px; pointer-events: auto; }
+    .d-btn { background: rgba(30, 41, 59, 0.75); border: 1px solid #38bdf8; border-radius: 8px; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  </style>
+</head>
+<body>
+
+  <div id="top-bar">
+    <span class="badge" id="scene-badge">MAPA ISOMÉTRICO</span>
+    <div>
+      <label class="file-btn">🥋 Cargar Goku <input type="file" id="goku-upload" accept="image/*"></label>
+      <button class="file-btn" id="toggle-scene-btn" style="color:#fde047;">⚔️ Cambiar</button>
+    </div>
+  </div>
+
+  <div id="canvas-wrap">
+    <canvas id="game" width="1024" height="576"></canvas>
+    <div id="mobile-controls">
+      <div id="dpad">
+        <div></div><div class="d-btn" id="btn-up">⬆️</div><div></div>
+        <div class="d-btn" id="btn-left">⬅️</div><div></div><div class="d-btn" id="btn-right">➡️</div>
+        <div></div><div class="d-btn" id="btn-down">⬇️</div><div></div>
+      </div>
+      <div class="touch-cluster">
+        <div class="t-btn" id="btn-jump" style="background:#3b82f6;">Salto</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const sceneBadge = document.getElementById('scene-badge');
+
+const TouchInput = { up: false, down: false, left: false, right: false, jump: false };
+function bindTouch(id, key) {
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.addEventListener('touchstart', e => { e.preventDefault(); TouchInput[key] = true; });
+  el.addEventListener('touchend', e => { e.preventDefault(); TouchInput[key] = false; });
+  el.addEventListener('mousedown', () => TouchInput[key] = true);
+  el.addEventListener('mouseup', () => TouchInput[key] = false);
+}
+bindTouch('btn-up', 'up'); bindTouch('btn-down', 'down');
+bindTouch('btn-left', 'left'); bindTouch('btn-right', 'right'); bindTouch('btn-jump', 'jump');
+
+let scene = 'OVERWORLD';
+const MapPlayer = { x: 512, y: 288, speed: 220, facingRight: true };
+
+document.getElementById('toggle-scene-btn').addEventListener('click', () => {
+  scene = scene === 'OVERWORLD' ? 'LEVEL' : 'OVERWORLD';
+  sceneBadge.textContent = scene === 'OVERWORLD' ? 'MAPA ISOMÉTRICO' : 'BATALLA';
+});
+
+function update(dt) {
+  let dx = 0, dy = 0;
+  if (TouchInput.left) dx = -1;
+  if (TouchInput.right) dx = 1;
+  if (TouchInput.up) dy = -1;
+  if (TouchInput.down) dy = 1;
+  MapPlayer.x += dx * MapPlayer.speed * dt;
+  MapPlayer.y += dy * MapPlayer.speed * dt;
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (scene === 'OVERWORLD') {
+    ctx.fillStyle = '#1e3a8a'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  } else {
+    ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+  // Dibujar a Goku (Placeholder circular naranja)
+  ctx.fillStyle = '#ea580c';
+  ctx.beginPath(); ctx.arc(MapPlayer.x, MapPlayer.y, 24, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke();
+}
+
+let lastTime = performance.now();
+function loop(now) {
+  const dt = Math.min(0.033, (now - lastTime) / 1000);
+  lastTime = now;
+  update(dt);
+  draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
